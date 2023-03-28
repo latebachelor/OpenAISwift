@@ -194,10 +194,10 @@ extension OpenAISwift {
                 kCFNetworkProxiesHTTPEnable: true,
                 kCFNetworkProxiesHTTPPort: proxy.port,
                 kCFNetworkProxiesHTTPProxy: proxy.host,
-                // 使用同样的 HTTP 代理设置来配置 HTTPS 代理
-                kCFStreamPropertyHTTPSProxyHost: proxy.host,
-                kCFStreamPropertyHTTPSProxyPort: proxy.port
+                kCFNetworkProxiesHTTPSProxy: proxy.host,
+                kCFNetworkProxiesHTTPSPort: proxy.port
             ]
+
             
             if let username = proxy.username, let password = proxy.password {
                 let authString = "\(username):\(password)"
