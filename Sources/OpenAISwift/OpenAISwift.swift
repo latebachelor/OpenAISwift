@@ -16,21 +16,27 @@ public class OpenAISwift {
     
     /// Configuration object for the client
     public struct Config {
-        
+        /// The proxy server configuration
+        public let proxy: (host: String, port: Int, username: String?, password: String?)?
+
         /// Initialiser
-        /// - Parameter session: the session to use for network requests.
-        public init(session: URLSession = URLSession.shared) {
+        /// - Parameters:
+        ///   - session: the session to use for network requests.
+        ///   - proxy: the proxy server configuration (optional).
+        public init(session: URLSession = URLSession.shared, proxy: (host: String, port: Int, username: String?, password: String?)? = nil) {
             self.session = session
+            self.proxy = proxy
         }
 
-        let session:URLSession
+        let session: URLSession
     }
     
     public init(authToken: String, config: Config = Config()) {
         self.token = authToken
-        self.config = Config()
+        self.config = config
     }
 }
+
 
 extension OpenAISwift {
     /// Send a Completion to the OpenAI API
@@ -178,8 +184,33 @@ extension OpenAISwift {
         }
     }
     
+    // 配置代理服务器
     private func makeRequest(request: URLRequest, completionHandler: @escaping (Result<Data, Error>) -> Void) {
-        let session = config.session
+        var session: URLSession
+
+        if let proxyHost = config.proxyHost, let proxyPort = config.proxyPort {
+            let proxyConfig = URLSessionConfiguration.ephemeral
+            proxyConfig.connectionProxyDictionary = [
+                kCFNetworkProxiesHTTPEnable: true,
+                kCFNetworkProxiesHTTPPort: proxyPort,
+                kCFNetworkProxiesHTTPProxy: proxyHost,
+                kCFNetworkProxiesHTTPSProxy: proxyHost,
+                kCFNetworkProxiesHTTPSPort: proxyPort
+            ]
+            
+            if let username = config.proxyUsername, let password = config.proxyPassword {
+                let authString = "\(username):\(password)"
+                if let authData = authString.data(using: .utf8) {
+                    let authValue = "Basic \(authData.base64EncodedString())"
+                    proxyConfig.httpAdditionalHeaders = ["Proxy-Authorization": authValue]
+                }
+            }
+
+            session = URLSession(configuration: proxyConfig)
+        } else {
+            session = config.session
+        }
+
         let task = session.dataTask(with: request) { (data, response, error) in
             if let error = error {
                 completionHandler(.failure(error))
@@ -187,9 +218,12 @@ extension OpenAISwift {
                 completionHandler(.success(data))
             }
         }
-        
+
         task.resume()
     }
+
+
+
     
     private func prepareRequest<BodyType: Encodable>(_ endpoint: Endpoint, body: BodyType) -> URLRequest {
         var urlComponents = URLComponents(url: URL(string: endpoint.baseURL())!, resolvingAgainstBaseURL: true)
