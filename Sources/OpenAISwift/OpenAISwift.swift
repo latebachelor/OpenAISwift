@@ -194,8 +194,8 @@ extension OpenAISwift {
                 kCFNetworkProxiesHTTPEnable: true,
                 kCFNetworkProxiesHTTPPort: proxy.port,
                 kCFNetworkProxiesHTTPProxy: proxy.host,
-                kCFNetworkProxiesHTTPSProxy: proxy.host,
-                kCFNetworkProxiesHTTPSPort: proxy.port
+                kCFStreamPropertyHTTPSProxyHost as String: proxy.host,
+                kCFStreamPropertyHTTPSProxyPort as String: proxy.port
             ]
 
             
