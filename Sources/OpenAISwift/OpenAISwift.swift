@@ -188,17 +188,17 @@ extension OpenAISwift {
     private func makeRequest(request: URLRequest, completionHandler: @escaping (Result<Data, Error>) -> Void) {
         var session: URLSession
 
-        if let proxyHost = config.proxyHost, let proxyPort = config.proxyPort {
+        if let proxy = config.proxy {
             let proxyConfig = URLSessionConfiguration.ephemeral
             proxyConfig.connectionProxyDictionary = [
                 kCFNetworkProxiesHTTPEnable: true,
-                kCFNetworkProxiesHTTPPort: proxyPort,
-                kCFNetworkProxiesHTTPProxy: proxyHost,
-                kCFNetworkProxiesHTTPSProxy: proxyHost,
-                kCFNetworkProxiesHTTPSPort: proxyPort
+                kCFNetworkProxiesHTTPPort: proxy.port,
+                kCFNetworkProxiesHTTPProxy: proxy.host,
+                kCFNetworkProxiesHTTPSProxy: proxy.host,
+                kCFNetworkProxiesHTTPSPort: proxy.port
             ]
             
-            if let username = config.proxyUsername, let password = config.proxyPassword {
+            if let username = proxy.username, let password = proxy.password {
                 let authString = "\(username):\(password)"
                 if let authData = authString.data(using: .utf8) {
                     let authValue = "Basic \(authData.base64EncodedString())"
@@ -221,6 +221,7 @@ extension OpenAISwift {
 
         task.resume()
     }
+
 
 
 
