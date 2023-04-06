@@ -16,25 +16,25 @@ public class OpenAISwift {
     
     /// Configuration object for the client
     public struct Config {
-        
-        /// Initialiser
+        /// The proxy server configuration
+        public let proxy: (url: URL, username: String?, password: String?)?
+
+        /// Initializer
         /// - Parameters:
         ///   - session: the session to use for network requests.
         ///   - proxyURL: the URL of the proxy server.
-        ///   - proxyUsername: the username to authenticate with the proxy server.
-        ///   - proxyPassword: the password to authenticate with the proxy server.
-        public init(session: URLSession = URLSession.shared, proxyURL: URL?, proxyUsername: String? = nil, proxyPassword: String? = nil) {
+        public init(session: URLSession = URLSession.shared, proxyURL: URL?, username: String? = nil, password: String? = nil) {
             self.session = session
-            self.proxyURL = proxyURL
-            self.proxyUsername = proxyUsername
-            self.proxyPassword = proxyPassword
+            if let proxyURL = proxyURL {
+                self.proxy = (proxyURL, username, password)
+            } else {
+                self.proxy = nil
+            }
         }
 
         let session: URLSession
-        let proxyURL: URL?
-        let proxyUsername: String?
-        let proxyPassword: String?
     }
+
     
     public init(authToken: String, config: Config = Config(proxyURL: nil)) {
         self.token = authToken
