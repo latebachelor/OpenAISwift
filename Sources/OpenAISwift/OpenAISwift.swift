@@ -21,13 +21,19 @@ public class OpenAISwift {
         /// - Parameters:
         ///   - session: the session to use for network requests.
         ///   - proxyURL: the URL of the proxy server.
-        public init(session: URLSession = URLSession.shared, proxyURL: URL?) {
+        ///   - proxyUsername: the username to authenticate with the proxy server.
+        ///   - proxyPassword: the password to authenticate with the proxy server.
+        public init(session: URLSession = URLSession.shared, proxyURL: URL?, proxyUsername: String? = nil, proxyPassword: String? = nil) {
             self.session = session
             self.proxyURL = proxyURL
+            self.proxyUsername = proxyUsername
+            self.proxyPassword = proxyPassword
         }
 
         let session: URLSession
         let proxyURL: URL?
+        let proxyUsername: String?
+        let proxyPassword: String?
     }
     
     public init(authToken: String, config: Config = Config(proxyURL: nil)) {
@@ -35,6 +41,7 @@ public class OpenAISwift {
         self.config = config
     }
 }
+
 
 
 extension OpenAISwift {
