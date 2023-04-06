@@ -194,7 +194,7 @@ extension OpenAISwift {
     private func makeRequest(request: URLRequest, completionHandler: @escaping (Result<Data, Error>) -> Void) {
         var session: URLSession
 
-        if let proxy = config.proxy {
+        if let proxy = config.proxy as (host: String, port: Int, username: String?, password: String)? {
             let proxyConfig = URLSessionConfiguration.ephemeral
             proxyConfig.connectionProxyDictionary = [
                 kCFNetworkProxiesHTTPEnable: true,
