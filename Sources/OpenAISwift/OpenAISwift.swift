@@ -205,7 +205,7 @@ extension OpenAISwift {
             ]
 
             
-            if let username = proxy.username, let password = proxy.password {
+            if let username: String = proxy.username, let password: String = proxy.password {
                 let authString = "\(username):\(password)"
                 if let authData = authString.data(using: .utf8) {
                     let authValue = "Basic \(authData.base64EncodedString())"
