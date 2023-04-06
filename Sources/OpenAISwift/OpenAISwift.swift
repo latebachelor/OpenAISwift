@@ -30,7 +30,7 @@ public class OpenAISwift {
         let proxyURL: URL?
     }
     
-    public init(authToken: String, config: Config = Config()) {
+    public init(authToken: String, config: Config = Config(proxyURL: nil)) {
         self.token = authToken
         self.config = config
     }
