@@ -23,6 +23,8 @@ public class OpenAISwift {
         /// - Parameters:
         ///   - session: the session to use for network requests.
         ///   - proxyURL: the URL of the proxy server.
+        ///   - username: the username for the proxy server authentication.
+        ///   - password: the password for the proxy server authentication.
         public init(session: URLSession = URLSession.shared, proxyURL: URL?, username: String? = nil, password: String? = nil) {
             self.session = session
             if let proxyURL = proxyURL {
@@ -32,11 +34,17 @@ public class OpenAISwift {
             }
         }
 
+        /// Initializer for the configuration without a proxy server
+        /// - Parameter session: the session to use for network requests.
+        public init(session: URLSession = URLSession.shared) {
+            self.session = session
+            self.proxy = nil
+        }
+
         let session: URLSession
     }
 
-    
-    public init(authToken: String, config: Config = Config(proxyURL: nil)) {
+    public init(authToken: String, config: Config = Config()) {
         self.token = authToken
         self.config = config
     }
