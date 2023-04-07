@@ -17,22 +17,26 @@ public class OpenAISwift {
     /// Configuration object for the client
     public struct Config {
         /// The proxy server configuration
-        public let proxy: (host: String, port: Int, username: String?, password: String?)?
+        public let proxy: (url: URL, username: String?, password: String?)?
 
         /// Initializer
         /// - Parameters:
         ///   - session: the session to use for network requests.
-        ///   - proxy: the proxy server configuration.
-        public init(session: URLSession = URLSession.shared, proxy: (host: String, port: Int, username: String?, password: String?)? = nil) {
+        ///   - proxyURL: the URL of the proxy server.
+        public init(session: URLSession = URLSession.shared, proxyURL: URL?, username: String? = nil, password: String? = nil) {
             self.session = session
-            self.proxy = proxy
+            if let proxyURL = proxyURL {
+                self.proxy = (proxyURL, username, password)
+            } else {
+                self.proxy = nil
+            }
         }
 
         let session: URLSession
     }
 
     
-    public init(authToken: String, config: Config = Config()) {
+    public init(authToken: String, config: Config = Config(proxyURL: nil)) {
         self.token = authToken
         self.config = config
     }
@@ -191,30 +195,22 @@ extension OpenAISwift {
         var session: URLSession
 
         if let proxy = config.proxy {
-            var proxyDict: [String: Any] = [
+            let proxyConfig = URLSessionConfiguration.ephemeral
+            proxyConfig.connectionProxyDictionary = [
                 kCFNetworkProxiesHTTPEnable: true,
-                kCFNetworkProxiesHTTPPort: proxy.url.port!,
-                kCFNetworkProxiesHTTPProxy: proxy.url.host!,
-                kCFStreamPropertyHTTPSProxyHost as String: proxy.url.host!,
-                kCFStreamPropertyHTTPSProxyPort as String: proxy.url.port!
+                kCFNetworkProxiesHTTPPort: proxy.url.port ?? 0,
+                kCFNetworkProxiesHTTPProxy: proxy.url.host ?? "",
+                kCFStreamPropertyHTTPSProxyHost as String: proxy.url.host ?? "",
+                kCFStreamPropertyHTTPSProxyPort as String: proxy.url.port ?? 0
             ]
-
+            
             if let username = proxy.username, let password = proxy.password {
                 let authString = "\(username):\(password)"
                 if let authData = authString.data(using: .utf8) {
                     let authValue = "Basic \(authData.base64EncodedString())"
-                    proxyDict["Proxy-Authorization"] = authValue
+                    proxyConfig.httpAdditionalHeaders = ["Proxy-Authorization": authValue]
                 }
             }
-
-            // Combine the proxy server address and port to form a URL
-            let proxyAddress = "\(proxy.url.scheme ?? "http")://\(proxy.url.host!):\(proxy.url.port!)"
-
-            let proxyConfig = URLSessionConfiguration.ephemeral
-            proxyConfig.connectionProxyDictionary = proxyDict
-            proxyConfig.connectionProxyDictionary?[kCFNetworkProxiesHTTPProxy] = proxyAddress
-            proxyConfig.connectionProxyDictionary?[kCFProxyUsernameKey] = proxy.username
-            proxyConfig.connectionProxyDictionary?[kCFProxyPasswordKey] = proxy.password
 
             session = URLSession(configuration: proxyConfig)
         } else {
@@ -231,6 +227,8 @@ extension OpenAISwift {
 
         task.resume()
     }
+
+
 
 
 
