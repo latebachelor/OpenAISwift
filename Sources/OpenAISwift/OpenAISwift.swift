@@ -208,18 +208,17 @@ extension OpenAISwift {
             let user = proxy.username ?? ""
             let password = proxy.password ?? ""
             let proxyDict = [
-                kCFProxyTypeKey as String: "https" as CFString,
-                kCFStreamPropertyHTTPSProxyHost: host as CFString,
+                kCFProxyTypeKey as String: kCFProxyTypeHTTPS as String,
+                kCFStreamPropertyHTTPSProxyHost as String: host as CFString,
                 kCFStreamPropertyHTTPSProxyPort as String: String(port) as CFString,
-                kCFProxyUsernameKey: user as CFString,
-                kCFProxyPasswordKey: password as CFString
+                kCFProxyUsernameKey as String: user as CFString,
+                kCFProxyPasswordKey as String: password as CFString
             ] as [String: Any]
             proxyConfig.connectionProxyDictionary = proxyDict
             session = URLSession(configuration: proxyConfig)
         } else {
             session = config.session
         }
-
 
         let task = session.dataTask(with: request) { (data, response, error) in
             if let error = error {
