@@ -201,6 +201,7 @@ extension OpenAISwift {
     // 配置代理服务器
     private func makeRequest(request: URLRequest, completionHandler: @escaping (Result<Data, Error>) -> Void) {
         var session: URLSession
+
         if let proxy = config.proxy {
             let proxyConfig = URLSessionConfiguration.ephemeral
             let host = proxy.url.host ?? ""
@@ -220,7 +221,6 @@ extension OpenAISwift {
             session = config.session
         }
 
-
         let task = session.dataTask(with: request) { (data, response, error) in
             if let error = error {
                 completionHandler(.failure(error))
@@ -231,7 +231,6 @@ extension OpenAISwift {
 
         task.resume()
     }
-
 
 
     
