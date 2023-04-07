@@ -201,29 +201,25 @@ extension OpenAISwift {
     // 配置代理服务器
     private func makeRequest(request: URLRequest, completionHandler: @escaping (Result<Data, Error>) -> Void) {
         var session: URLSession
-
         if let proxy = config.proxy {
             let proxyConfig = URLSessionConfiguration.ephemeral
-            proxyConfig.connectionProxyDictionary = [
-                kCFNetworkProxiesHTTPEnable: true,
-                kCFNetworkProxiesHTTPPort: proxy.url.port ?? 0,
-                kCFNetworkProxiesHTTPProxy: proxy.url.host ?? "",
-                kCFStreamPropertyHTTPSProxyHost as String: proxy.url.host ?? "",
-                kCFStreamPropertyHTTPSProxyPort as String: proxy.url.port ?? 0
-            ]
-            
-            if let username = proxy.username, let password = proxy.password {
-                let authString = "\(username):\(password)"
-                if let authData = authString.data(using: .utf8) {
-                    let authValue = "Basic \(authData.base64EncodedString())"
-                    proxyConfig.httpAdditionalHeaders = ["Proxy-Authorization": authValue]
-                }
-            }
-
+            let host = proxy.url.host ?? ""
+            let port = proxy.url.port ?? 0
+            let user = proxy.username ?? ""
+            let password = proxy.password ?? ""
+            let proxyDict = [
+                kCFProxyTypeKey: kCFProxyTypeHTTPS,
+                kCFStreamPropertyHTTPSProxyHost as String: host,
+                kCFStreamPropertyHTTPSProxyPort as Int: port,
+                kCFProxyUsernameKey: user,
+                kCFProxyPasswordKey: password
+            ] as [String: Any]
+            proxyConfig.connectionProxyDictionary = proxyDict
             session = URLSession(configuration: proxyConfig)
         } else {
             session = config.session
         }
+
 
         let task = session.dataTask(with: request) { (data, response, error) in
             if let error = error {
