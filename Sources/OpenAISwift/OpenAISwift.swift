@@ -200,38 +200,35 @@ extension OpenAISwift {
     
     // 配置代理服务器
     private func makeRequest(request: URLRequest, completionHandler: @escaping (Result<Data, Error>) -> Void) {
-            var session: URLSession
-            if let proxy = config.proxy {
-                let proxyConfig = URLSessionConfiguration.ephemeral
-                let host = proxy.url.host ?? ""
-                let port = proxy.url.port != nil ? String(proxy.url.port!) : ""
-                let user = proxy.username ?? ""
-                let password = proxy.password ?? ""
-                let proxyDict = [
-                    kCFProxyTypeKey: kCFProxyTypeHTTPS,
-                    kCFStreamPropertyHTTPSProxyHost as String: host,
-                    kCFStreamPropertyHTTPSProxyPort as String: port,
-                    kCFProxyUsernameKey: user,
-                    kCFProxyPasswordKey: password
-                ] as [String: Any]
-                proxyConfig.connectionProxyDictionary = proxyDict
-                session = URLSession(configuration: proxyConfig)
-            } else {
-                session = config.session
-            }
-
-
-            let task = session.dataTask(with: request) { (data, response, error) in
-                if let error = error {
-                    completionHandler(.failure(error))
-                } else if let data = data {
-                    completionHandler(.success(data))
-                }
-            }
-
-            task.resume()
+        var session: URLSession
+        if let proxy = config.proxy {
+            let proxyConfig = URLSessionConfiguration.ephemeral
+            let host = proxy.url.host ?? ""
+            let port = proxy.url.port ?? 0
+            let user = proxy.username ?? ""
+            let password = proxy.password ?? ""
+            let proxyDict = [
+                kCFProxyTypeKey: kCFProxyTypeHTTPS as String,
+                kCFStreamPropertyHTTPSProxyHost as CFString: host as CFString,
+                kCFStreamPropertyHTTPSProxyPort as CFString: port as CFString,
+                kCFProxyUsernameKey: user as CFString,
+                kCFProxyPasswordKey: password as CFString
+            ] as CFDictionary
+            proxyConfig.connectionProxyDictionary = proxyDict
+            session = URLSession(configuration: proxyConfig)
+        } else {
+            session = config.session
         }
 
+        let task = session.dataTask(with: request) { (data, response, error) in
+            if let error = error {
+                completionHandler(.failure(error))
+            } else if let data = data {
+                completionHandler(.success(data))
+            }
+        }
+        task.resume()
+    }
 
 
     
