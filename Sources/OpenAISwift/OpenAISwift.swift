@@ -203,22 +203,23 @@ extension OpenAISwift {
         var session: URLSession
         if let proxy = config.proxy {
             let proxyConfig = URLSessionConfiguration.ephemeral
-            let host = proxy.url.host ?? ""
-            let port = proxy.url.port ?? 0
-            let user = proxy.username ?? ""
-            let password = proxy.password ?? ""
+            let host = proxy.url.host ?? "" as CFString
+            let port = proxy.url.port ?? 0 as CFNumber
+            let user = proxy.username ?? "" as CFString
+            let password = proxy.password ?? "" as CFString
             let proxyDict = [
-                kCFProxyTypeKey: kCFProxyTypeHTTPS as String,
-                kCFStreamPropertyHTTPSProxyHost as CFString: host as CFString,
-                kCFStreamPropertyHTTPSProxyPort as CFString: port as CFString,
-                kCFProxyUsernameKey: user as CFString,
-                kCFProxyPasswordKey: password as CFString
+                kCFProxyTypeKey: kCFProxyTypeHTTPS,
+                kCFStreamPropertyHTTPSProxyHost: host,
+                kCFStreamPropertyHTTPSProxyPort: port,
+                kCFProxyUsernameKey: user,
+                kCFProxyPasswordKey: password
             ] as CFDictionary
             proxyConfig.connectionProxyDictionary = proxyDict
             session = URLSession(configuration: proxyConfig)
         } else {
             session = config.session
         }
+
 
         let task = session.dataTask(with: request) { (data, response, error) in
             if let error = error {
