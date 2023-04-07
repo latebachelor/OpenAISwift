@@ -201,25 +201,26 @@ extension OpenAISwift {
     // 配置代理服务器
     private func makeRequest(request: URLRequest, completionHandler: @escaping (Result<Data, Error>) -> Void) {
         var session: URLSession
+        
         if let proxy = config.proxy {
             let proxyConfig = URLSessionConfiguration.ephemeral
-            let host = proxy.url.host ?? "" as CFString
-            let port = proxy.url.port ?? 0 as CFNumber
-            let user = proxy.username ?? "" as CFString
-            let password = proxy.password ?? "" as CFString
+            let host = proxy.url.host ?? ""
+            let port = proxy.url.port ?? 0
+            let user = proxy.username ?? ""
+            let password = proxy.password ?? ""
             let proxyDict = [
-                kCFProxyTypeKey: kCFProxyTypeHTTPS,
-                kCFStreamPropertyHTTPSProxyHost: host,
-                kCFStreamPropertyHTTPSProxyPort: port,
-                kCFProxyUsernameKey: user,
-                kCFProxyPasswordKey: password
-            ] as CFDictionary
-            proxyConfig.connectionProxyDictionary = proxyDict as! [AnyHashable : Any]
+                kCFProxyTypeKey as String: kCFProxyTypeHTTPS as String,
+                kCFStreamPropertyHTTPSProxyHost as String: host,
+                kCFStreamPropertyHTTPSProxyPort as String: String(port),
+                kCFProxyUsernameKey as String: user,
+                kCFProxyPasswordKey as String: password
+            ] as [String: Any]
+            proxyConfig.connectionProxyDictionary = proxyDict
             session = URLSession(configuration: proxyConfig)
         } else {
             session = config.session
         }
-
+        
         let task = session.dataTask(with: request) { (data, response, error) in
             if let error = error {
                 completionHandler(.failure(error))
@@ -227,6 +228,7 @@ extension OpenAISwift {
                 completionHandler(.success(data))
             }
         }
+        
         task.resume()
     }
 
