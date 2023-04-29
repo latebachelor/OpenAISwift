@@ -31,14 +31,18 @@ extension Endpoint {
     var method: String {
         switch self {
             case .completions, .edits, .chat, .images:
-            return "POST"
+                return "POST"
+            case .chatStream:
+                return "GET"
         }
     }
     
     func baseURL() -> String {
         switch self {
             case .completions, .edits, .chat, .images:
-            return "https://api.openai.com"
+                return "https://api.openai.com"
+            case .chatStream:
+                return "wss://api.openai.com"
         }
     }
 }
