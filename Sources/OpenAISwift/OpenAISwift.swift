@@ -143,7 +143,7 @@ extension OpenAISwift {
                                     maxTokens: maxTokens,
                                     presencePenalty: presencePenalty,
                                     frequencyPenalty: frequencyPenalty,
-                                    logitBias: logitBias
+                                    logitBias: logitBias,
                                     stream: stream)
 
         let request = prepareRequest(endpoint, body: body)
