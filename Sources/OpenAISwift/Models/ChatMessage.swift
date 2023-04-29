@@ -68,6 +68,8 @@ public struct ChatConversation: Encodable {
 
     /// Modify the likelihood of specified tokens appearing in the completion. Maps tokens (specified by their token ID in the OpenAI Tokenizer—not English words) to an associated bias value from -100 to 100. Values between -1 and 1 should decrease or increase likelihood of selection; values like -100 or 100 should result in a ban or exclusive selection of the relevant token.
     let logitBias: [Int: Double]?
+    
+    let stream: Bool // 修改第三方库。新增文本流水显示。
 
     enum CodingKeys: String, CodingKey {
         case user
@@ -81,6 +83,7 @@ public struct ChatConversation: Encodable {
         case presencePenalty = "presence_penalty"
         case frequencyPenalty = "frequency_penalty"
         case logitBias = "logit_bias"
+        case stream // 修改第三方库代码，新增文本流水显示。
     }
 }
 

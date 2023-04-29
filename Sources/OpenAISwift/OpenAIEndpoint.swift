@@ -8,6 +8,7 @@ enum Endpoint {
     case completions
     case edits
     case chat
+    case chatStream // 修改第三方库
     case images
 }
 
@@ -20,6 +21,8 @@ extension Endpoint {
                 return "/v1/edits"
             case .chat:
                 return "/v1/chat/completions"
+            case .chatStream:
+                return "/v1/chat/stream" // 修改第三方库 endpoint path for chat stream
             case .images:
                 return "/v1/images/generations"
         }

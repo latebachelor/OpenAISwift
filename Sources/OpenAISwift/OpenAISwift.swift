@@ -130,8 +130,9 @@ extension OpenAISwift {
                          presencePenalty: Double? = 0,
                          frequencyPenalty: Double? = 0,
                          logitBias: [Int: Double]? = nil,
+                         stream: Bool = false, // 修改第三方库，添加文本流水显示功能。
                          completionHandler: @escaping (Result<OpenAI<MessageResult>, OpenAIError>) -> Void) {
-        let endpoint = Endpoint.chat
+        let endpoint = stream ? Endpoint.chatStream : Endpoint.chat
         let body = ChatConversation(user: user,
                                     messages: messages,
                                     model: model.modelName,
@@ -314,7 +315,8 @@ extension OpenAISwift {
                          maxTokens: Int? = nil,
                          presencePenalty: Double? = 0,
                          frequencyPenalty: Double? = 0,
-                         logitBias: [Int: Double]? = nil) async throws -> OpenAI<MessageResult> {
+                         logitBias: [Int: Double]? = nil,
+                         stream: Bool = false) async throws -> OpenAI<MessageResult> {
         return try await withCheckedThrowingContinuation { continuation in
             sendChat(with: messages,
                      model: model,
@@ -326,7 +328,8 @@ extension OpenAISwift {
                      maxTokens: maxTokens,
                      presencePenalty: presencePenalty,
                      frequencyPenalty: frequencyPenalty,
-                     logitBias: logitBias) { result in
+                     logitBias: logitBias,
+                     stream: stream) { result in
                 switch result {
                     case .success: continuation.resume(with: result)
                     case .failure(let failure): continuation.resume(throwing: failure)
